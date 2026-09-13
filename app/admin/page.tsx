@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Lock, User, ShieldCheck, ArrowLeft, Users, FileText, CheckCircle, Clock } from 'lucide-react';
+import { Lock, User, ShieldCheck, ArrowLeft, FileText, Clock, CheckCircle } from 'lucide-react';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -11,7 +11,6 @@ export default function AdminPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Identifiants par défaut pour les tests
     if (username === 'admin' && password === 'lasalle2025') {
       setIsAuthenticated(true);
       setError('');
@@ -90,7 +89,6 @@ export default function AdminPage() {
 
   return (
     <main className="min-h-screen bg-slate-900 text-white p-6 space-y-8">
-      {/* Header Admin */}
       <div className="max-w-7xl mx-auto flex items-center justify-between border-b border-slate-800 pb-4">
         <div className="flex items-center gap-3">
           <ShieldCheck className="w-8 h-8 text-blue-400" />
@@ -109,7 +107,6 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Statistiques rapides */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="p-5 bg-slate-800/80 rounded-2xl border border-slate-700 space-y-2">
           <div className="flex items-center justify-between text-slate-400 text-xs">
