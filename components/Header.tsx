@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { GraduationCap, MapPin, Users, Sparkles, Lock } from 'lucide-react';
+import { GraduationCap, MapPin, Users, Sparkles } from 'lucide-react';
 
 interface HeaderProps {
   onOpenParentPortal: () => void;
@@ -57,13 +57,6 @@ export default function Header({
             <Sparkles className="w-4 h-4 text-blue-200" />
             <span>Demander une Inscription</span>
           </button>
-          <a
-            href="/admin"
-            className="p-2.5 rounded-xl border border-slate-200 text-slate-400 hover:text-blue-600 hover:border-blue-200 transition"
-            title="Accès Administration"
-          >
-            <Lock className="w-4 h-4" />
-          </a>
         </div>
       </div>
     </div>
