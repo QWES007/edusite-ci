@@ -1,21 +1,28 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const rawKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-// Vérification et nettoyage strict de l'URL
-const isValidUrl = (url: string) => {
-  try {
-    return url.startsWith('http://') || url.startsWith('https://');
-  } catch {
-    return false;
+const getSupabaseUrl = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (url && url.startsWith('http')) {
+    return url.trim();
   }
+  return 'https://hoyeybujcqrfxtpywmyv.supabase.co';
 };
 
-const supabaseUrl = isValidUrl(rawUrl) 
-  ? rawUrl.trim() 
-  : 'https://hoyeybujcqrfxtpywmyv.supabase.co';
+const getSupabaseAnonKey = () => {
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (key && key.length > 0) {
+    return key.trim();
+  }
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhveWV5YnVqY3FyZnh0cHl3bXl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzOTIxMzAsImV4cCI6MjEwNDk2ODEzMH0.BOgXy6XzwHeD8UKlqokTiUx9LcjAmHtChv8faYFfyVA';
+};
 
-const supabaseAnonKey = rawKey ? rawKey.trim() : 'placeholder-anon-key';
+let supabaseInstance: SupabaseClient | null = null;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const getSupabase = (): SupabaseClient => {
+  if (!supabaseInstance) {
+    supabaseInstance = createClient(getSupabaseUrl(), getSupabaseAnonKey());
+  }
+  return supabaseInstance;
+};
+
+export const supabase = createClient(getSupabaseUrl(), getSupabaseAnonKey());

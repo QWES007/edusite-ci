@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Lock, User, ShieldCheck, ArrowLeft, FileText, Clock, CheckCircle, RefreshCw } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 
 interface Admission {
   id: string;
@@ -22,10 +22,9 @@ export default function AdminPage() {
   const [admissions, setAdmissions] = useState<Admission[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Fonction pour récupérer les vraies admissions stockées dans Supabase
   const fetchAdmissions = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('admissions')
       .select('*')
       .order('created_at', { ascending: false });

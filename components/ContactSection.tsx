@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { MapPin, Phone, Clock, Send, CheckCircle2, Loader2 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 
 export default function ContactSection() {
   const [submitted, setSubmitted] = useState(false);
@@ -19,7 +19,7 @@ export default function ContactSection() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.from('admissions').insert([
+      const { error } = await getSupabase().from('admissions').insert([
         {
           student_name: formData.student_name,
           target_class: formData.target_class,
