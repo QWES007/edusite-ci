@@ -1,15 +1,45 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MapPin, Phone, Clock, Send, CheckCircle2 } from 'lucide-react';
+import { MapPin, Phone, Clock, Send, CheckCircle2, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function ContactSection() {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    student_name: '',
+    target_class: 'Classe de 6ème',
+    parent_name: '',
+    phone: '',
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 5000);
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.from('admissions').insert([
+        {
+          student_name: formData.student_name,
+          target_class: formData.target_class,
+          parent_name: formData.parent_name,
+          phone: formData.phone,
+          status: 'En attente',
+        },
+      ]);
+
+      if (error) throw error;
+
+      setSubmitted(true);
+      setFormData({ student_name: '', target_class: 'Classe de 6ème', parent_name: '', phone: '' });
+      setTimeout(() => setSubmitted(false), 5000);
+    } catch (err) {
+      console.error('Erreur lors de l’envoi :', err);
+      alert('Une erreur est survenue lors de l’envoi. Veuillez réessayer.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -60,17 +90,28 @@ export default function ContactSection() {
             <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-2xl text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
               <div className="font-bold text-slate-900 text-sm">Demande transmise avec succès !</div>
+              <p className="text-xs text-slate-600">Le secrétariat vous recontactera très prochainement.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">Nom & Prénoms de l’élève *</label>
-                  <input required placeholder="Ex: Kouassi Emmanuel" className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none" />
+                  <input
+                    required
+                    placeholder="Ex: Kouassi Emmanuel"
+                    value={formData.student_name}
+                    onChange={(e) => setFormData({ ...formData, student_name: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  />
                 </div>
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">Classe souhaitée *</label>
-                  <select className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none">
+                  <select
+                    value={formData.target_class}
+                    onChange={(e) => setFormData({ ...formData, target_class: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  >
                     <option>Classe de 6ème</option>
                     <option>Classe de 5ème</option>
                     <option>Classe de 4ème</option>
@@ -86,18 +127,44 @@ export default function ContactSection() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">Nom du Parent *</label>
-                  <input required placeholder="Ex: M. Kouassi Sylvain" className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none" />
+                  <input
+                    required
+                    placeholder="Ex: M. Kouassi Sylvain"
+                    value={formData.parent_name}
+                    onChange={(e) => setFormData({ ...formData, parent_name: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  />
                 </div>
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">Téléphone / WhatsApp *</label>
-                  <input required type="tel" placeholder="+225 07 XX XX XX XX" className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none" />
+                  <input
+                    required
+                    type="tel"
+                    placeholder="+225 07 XX XX XX XX"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  />
                 </div>
               </div>
 
               <div className="pt-2 flex justify-end">
-                <button type="submit" className="px-6 py-3 rounded-xl bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md flex items-center gap-2 cursor-pointer">
-                  <Send className="w-4 h-4" />
-                  <span>Envoyer la demande</span>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-6 py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm shadow-md flex items-center gap-2 cursor-pointer transition disabled:opacity-50"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Envoi en cours...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      <span>Envoyer la demande</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>
